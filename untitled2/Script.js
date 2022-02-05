@@ -4,86 +4,94 @@ let yAxis = 5;
 let highestZIndex = 0;
 let currentID = '0';
 let numberOfBoxes = 0;
-let xPoint = 5;
-let yPoint = 5;
-let startingWidth = 100;
-let startingHeight = 100;
-
+let startingMouseX = 0;
+let startingMouseY =0;
+let myBox;
+let myButton;
+let myUnderBox;
+let width;
+let height;
+let startingMouseInsideX;
+let startingMouseInsideY;
 function rotate(event){
-    console.log("I am rotaaating!!!!");
-    let delta_x = event.pageX - (xPoint + 55);//touch_x - center_x
-    let delta_y =  (yPoint + 55) - event.pageY;//center_y - touch_y;
+    let delta_x = event.pageX - (Number(myBox.style.left.slice(0,-2)) + Number(myBox.style.width.slice(0,-2))/2);//touch_x - center_x
+    let delta_y = (Number(myBox.style.top.slice(0,-2)) + Number(myBox.style.height.slice(0,-2))/2) - event.pageY;//center_y - touch_y;
     let theta_radians = Math.atan2(delta_y, delta_x);
 
     if (theta_radians < 0)
         theta_radians = Math.abs(theta_radians);
     else
         theta_radians = 2 * Math.PI - theta_radians;
-    document.getElementById(currentID).style.transform = "rotate(" + theta_radians + "rad)";
-    document.getElementById(('u'+currentID).toString()).style.transform = "rotate(" + theta_radians + "rad)";
-    document.getElementById(('b'+currentID).toString()).style.transform = "rotate(" + theta_radians + "rad)";
-    console.log(theta_radians);
+
+    myBox.style.transform = "rotate(" + theta_radians + "rad)";
+    myButton.style.transform = "rotate(" + theta_radians + "rad)";
+    myUnderBox.style.transform = "rotate(" + theta_radians + "rad)";
+}
+
+function reCenterMyButton(){
+    myButton.style.left = wrapperForStylePx( Number(myBox.style.left.slice(0,-2)) -15 + Number((myBox.style.width.slice(0,-2)))/2 );
+    myButton.style.top= wrapperForStylePx(1.35 * myBox.style.height.slice(0,-2) + Number(myBox.style.top.slice(0,-2)));
 }
 
 function onHoverUnderBox(){
-    let myUnderBox = document.getElementById('u'+currentID);
     myUnderBox.style.cursor= 'nwse-resize';
 }
 
 function myResizeFunction(event) {
     xAxis=event.pageX;
     yAxis=event.pageY;
-    console.log("Mouse is resizing BOX!");
-    let myBox=document.getElementById(currentID);
-    let x = xAxis +'px';
-    let y = yAxis + 'px';
-    console.log(x);
-    xPoint=xAxis;
-    yPoint=yAxis;
 
-    myBox.style.width+=wrapperForStylePx(xAxis);//x;
-    myBox.style.height+=wrapperForStylePx(yAxis);//y;
+    console.log(Number(myBox.style.width.slice(0,-2)));
+    myBox.style.width=wrapperForStylePx(width+(xAxis-startingMouseX) -10);//x;
+    myBox.style.height=wrapperForStylePx(height+(yAxis-startingMouseY) -10);//y;
 
+    myUnderBox.style.width = wrapperForStylePx(width+(xAxis-startingMouseX));
+    myUnderBox.style.height = wrapperForStylePx(height+(yAxis-startingMouseY));
 
-    document.getElementById(('u'+currentID).toString()).style.width = wrapperForStylePx(startingWidth+xAxis +100);
-    document.getElementById(('u'+currentID).toString()).style.height = wrapperForStylePx(startingHeight+yAxis +100);
+    reCenterMyButton();
 }
 
-function handleMouseDownResize(){
-    console.log("Resize function is active!");
+function handleMouseDownResize(event){
+    startingMouseX = event.pageX; //where Mouse Starts Dragging From
+    startingMouseY = event.pageY; //where Mouse Starts Dragging From
+    width = Number(myBox.style.width.slice(0,-2));
+    height = Number(myBox.style.height.slice(0,-2));
     document.onmousemove=myResizeFunction;
 }
 
 function addNewBox() {
-    let newBox = document.createElement('div');
-    newBox.setAttribute('id',(numberOfBoxes).toString());
-    newBox.style.cssText = "width: 100px; height:100px; background: blue; position: absolute; border:none;";
-    newBox.style.top= '5px';
-    newBox.style.left= '5px';
+    myBox = document.createElement('div');
+    myBox.setAttribute('id',(numberOfBoxes).toString());
+    myBox.setAttribute('onmousedown', "handleMouseDownBox(event)");
+    myBox.style.cssText = "width: 100px; height:100px; background: blue; position: absolute; border:none; border-radius:50%";
+    myBox.style.top= '5px';
+    myBox.style.left= '5px';
 
-    let newUnderBox = document.createElement('div');
-    newUnderBox.setAttribute('id',('u'+numberOfBoxes).toString());
-    newUnderBox.style.cssText = "width: 110px; height:110px; background: black; position: absolute; border:none;";
-    newUnderBox.setAttribute('onmouseenter','onHoverUnderBox()');
-    newUnderBox.setAttribute('onmousedown', 'handleMouseDownResize()');
+    myUnderBox = document.createElement('div');
+    myUnderBox.setAttribute('id',('u'+numberOfBoxes).toString());
+    myUnderBox.style.cssText = "width: 110px; height:110px; background: black; position: absolute; border:none;";
+    myUnderBox.setAttribute('onmouseenter','onHoverUnderBox()');
+    myUnderBox.setAttribute('onmousedown', 'handleMouseDownResize(event)');
 
-    let rotateButton = document.createElement('button');
-    rotateButton.setAttribute('id',('b'+numberOfBoxes++).toString());
-    rotateButton.setAttribute('onmousedown', 'handleMouseDownRotate()');
-    rotateButton.style.cssText = "width: 30px; height: 30px; position:absolute; border-radius:50%;";
-    rotateButton.style.left= 40  + 'px';
-    rotateButton.style.top= 135+ 'px';
+    myButton = document.createElement('button');
+    myButton.setAttribute('id',('b'+numberOfBoxes++).toString());
+    myButton.setAttribute('onmousedown', 'handleMouseDownRotate(this.id)');
+    myButton.style.cssText = "width: 30px; height: 30px; position:absolute; border-radius:50%;";
+    myButton.style.left= 40  + 'px';
+    myButton.style.top= 135+ 'px';
 
-    document.getElementById("boxContainer").appendChild(newUnderBox);
-
-    document.getElementById("boxContainer").appendChild(rotateButton);
-    newBox.setAttribute('onmousedown', "handleMouseDownBox(this.id)");
-    // newBox.setAttribute('onclick', "handleMouseClick(this.id)");
-    document.getElementById("boxContainer").appendChild(newBox);
+    let boxContainer = document.getElementById("boxContainer");
+    boxContainer.appendChild(myUnderBox);
+    boxContainer.appendChild(myButton);
+    boxContainer.appendChild(myBox);
 }
 
-function handleMouseDownRotate(){
-    console.log("Rotate button is pressed!");
+function handleMouseDownRotate(id){
+    id=id.slice(1);
+    currentID = id;
+    myBox = document.getElementById(id);
+    myButton = document.getElementById('b'+id);
+    myUnderBox = document.getElementById('u'+id);
     document.onmousemove = rotate;
 }
 
@@ -94,43 +102,35 @@ function wrapperForStylePx(size){
 function handleMouseMove(event) {
     xAxis=event.pageX;
     yAxis=event.pageY;
-    console.log("Mouse is moving!");
-    let myBox=document.getElementById(currentID);
-    let x = xAxis +'px';
-    let y = yAxis + 'px';
-    console.log(x);
-    xPoint=xAxis;
-    yPoint=yAxis;
 
-    myBox.style.left=wrapperForStylePx(xAxis+5);//x;
-    myBox.style.top=wrapperForStylePx(yAxis+5);//y;
+    myBox.style.left=wrapperForStylePx(xAxis-startingMouseInsideX+5);//x;
+    myBox.style.top=wrapperForStylePx(yAxis-startingMouseInsideY+5);//y;
 
-    console.log(('b'+currentID).toString());
-    let myButton = document.getElementById(('b'+currentID).toString());
-    myButton.style.left = (40 + xAxis) + 'px';
-    myButton.style.top= (135 + yAxis) + 'px';
+    reCenterMyButton();
 
-    document.getElementById(('u'+currentID).toString()).style.left=x;
-    document.getElementById(('u'+currentID).toString()).style.top=y;
-
-
+    myUnderBox.style.left=wrapperForStylePx(xAxis-startingMouseInsideX);
+    myUnderBox.style.top=wrapperForStylePx(yAxis-startingMouseInsideY);
 }
-function handleMouseDownBox(id) {
-    console.log("Mouse is Down!");
-    currentID = id;
 
-    document.getElementById(('b'+currentID).toString()).style.zIndex=(highestZIndex+ 1).toString();
+function handleMouseDownBox(event) {
+    currentID = event.target.id;
+    console.log(currentID)
+    myBox = document.getElementById(currentID);
+    myButton = document.getElementById('b'+currentID);
+    myUnderBox = document.getElementById('u'+currentID);
 
-    document.getElementById(id).style.zIndex=(highestZIndex+=2).toString();
+    startingMouseX = event.pageX; //where Mouse Starts Dragging From
+    startingMouseY = event.pageY; //where Mouse Starts Dragging From
+    startingMouseInsideX = Number(startingMouseX-Number(myBox.style.left.slice(0,-2)));
+    startingMouseInsideY = Number(startingMouseY-Number(myBox.style.top.slice(0,-2)));
+
+    myButton.style.zIndex=(highestZIndex + 1).toString();
+    myUnderBox.style.zIndex=(highestZIndex + 1).toString();
+    myBox.style.zIndex=(highestZIndex+=2).toString();
+
     document.onmousemove = handleMouseMove;
 }
 
-// function handleMouseClick(event){
-//     xPoint=event.pageX;
-//     yPoint=event.pageY;
-// }
-
 function handleMouseUp() {
     document.onmousemove = null;
-    console.log("Mouse is Up!")
 }
