@@ -1,3 +1,5 @@
+
+
 document.onmouseup = handleMouseUp;
 let xAxis = 5;
 let yAxis = 5;
@@ -13,6 +15,8 @@ let width;
 let height;
 let startingMouseInsideX;
 let startingMouseInsideY;
+let myUnderTriangle;
+
 function rotate(event){
     let delta_x = event.pageX - (Number(myBox.style.left.slice(0,-2)) + Number(myBox.style.width.slice(0,-2))/2);//touch_x - center_x
     let delta_y = (Number(myBox.style.top.slice(0,-2)) + Number(myBox.style.height.slice(0,-2))/2) - event.pageY;//center_y - touch_y;
@@ -22,6 +26,8 @@ function rotate(event){
         theta_radians = Math.abs(theta_radians);
     else
         theta_radians = 2 * Math.PI - theta_radians;
+
+    theta_radians-=1.570796;
 
     myBox.style.transform = "rotate(" + theta_radians + "rad)";
     myButton.style.transform = "rotate(" + theta_radians + "rad)";
@@ -69,9 +75,18 @@ function addNewBox() {
 
     myUnderBox = document.createElement('div');
     myUnderBox.setAttribute('id',('u'+numberOfBoxes).toString());
-    myUnderBox.style.cssText = "width: 110px; height:110px; background: black; position: absolute; border:none;";
+    myUnderBox.style.cssText = "width: 110px; height:110px; background: none; position: absolute; border:none; overflow:hidden";
     myUnderBox.setAttribute('onmouseenter','onHoverUnderBox()');
     myUnderBox.setAttribute('onmousedown', 'handleMouseDownResize(event)');
+
+    myUnderTriangle = document.createElement('div');
+    myUnderTriangle.setAttribute('id',('t'+numberOfBoxes).toString());
+    myUnderTriangle.style.cssText = "background: black; position: absolute; border:none;";
+    myUnderTriangle.style.width = '200px';
+    myUnderTriangle.style.height = '200px';
+    myUnderTriangle.style.transform = 'rotate(45deg) translate(-86%,0)';
+
+    myUnderBox.appendChild(myUnderTriangle);
 
     myButton = document.createElement('button');
     myButton.setAttribute('id',('b'+numberOfBoxes++).toString());
