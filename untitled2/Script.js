@@ -1,8 +1,4 @@
-
-
 document.onmouseup = handleMouseUp;
-let xAxis = 5;
-let yAxis = 5;
 let highestZIndex = 0;
 let currentID = '0';
 let numberOfBoxes = 0;
@@ -15,7 +11,8 @@ let width;
 let height;
 let startingMouseInsideX;
 let startingMouseInsideY;
-let myUnderTriangle;
+//let myUnderTriangle;
+let startingRotationValue;
 
 function rotate(event){
     let delta_x = event.pageX - (Number(myBox.style.left.slice(0,-2)) + Number(myBox.style.width.slice(0,-2))/2);//touch_x - center_x
@@ -27,11 +24,22 @@ function rotate(event){
     else
         theta_radians = 2 * Math.PI - theta_radians;
 
-    theta_radians-=1.570796;
+    theta_radians+=Number(startingRotationValue)-1.570796;
 
     myBox.style.transform = "rotate(" + theta_radians + "rad)";
     myButton.style.transform = "rotate(" + theta_radians + "rad)";
     myUnderBox.style.transform = "rotate(" + theta_radians + "rad)";
+}
+function handleMouseDownRotate(id){
+    id=id.slice(1);
+    currentID = id;
+    updateElements();
+    if(myBox.style.transform.slice(-6,-3))
+        {startingRotationValue = myBox.style.transform.slice(7,-4)}
+    else
+        {startingRotationValue=0;}
+
+    document.onmousemove = rotate;
 }
 
 function reCenterMyButton(){
@@ -44,20 +52,18 @@ function onHoverUnderBox(){
 }
 
 function myResizeFunction(event) {
-    xAxis=event.pageX;
-    yAxis=event.pageY;
+    myBox.style.width=wrapperForStylePx(width+(event.pageX-startingMouseX) -10);//x;
+    myBox.style.height=wrapperForStylePx(height+(event.pageY-startingMouseY) -10);//y;
 
-    console.log(Number(myBox.style.width.slice(0,-2)));
-    myBox.style.width=wrapperForStylePx(width+(xAxis-startingMouseX) -10);//x;
-    myBox.style.height=wrapperForStylePx(height+(yAxis-startingMouseY) -10);//y;
-
-    myUnderBox.style.width = wrapperForStylePx(width+(xAxis-startingMouseX));
-    myUnderBox.style.height = wrapperForStylePx(height+(yAxis-startingMouseY));
+    myUnderBox.style.width = wrapperForStylePx(width+(event.pageX-startingMouseX));
+    myUnderBox.style.height = wrapperForStylePx(height+(event.pageY-startingMouseY));
 
     reCenterMyButton();
 }
 
 function handleMouseDownResize(event){
+    currentID = event.target.id.slice(1);
+    updateElements();
     startingMouseX = event.pageX; //where Mouse Starts Dragging From
     startingMouseY = event.pageY; //where Mouse Starts Dragging From
     width = Number(myBox.style.width.slice(0,-2));
@@ -65,35 +71,41 @@ function handleMouseDownResize(event){
     document.onmousemove=myResizeFunction;
 }
 
+function updateElements(){
+    myBox = document.getElementById(currentID);
+    myButton = document.getElementById('b'+currentID);
+    myUnderBox = document.getElementById('u'+currentID);
+}
+
 function addNewBox() {
     myBox = document.createElement('div');
     myBox.setAttribute('id',(numberOfBoxes).toString());
     myBox.setAttribute('onmousedown', "handleMouseDownBox(event)");
-    myBox.style.cssText = "width: 100px; height:100px; background: blue; position: absolute; border:none; border-radius:50%";
+    myBox.style.cssText = "width: 100px; height:100px; background: blue; position: absolute; border:none;";
     myBox.style.top= '5px';
     myBox.style.left= '5px';
 
     myUnderBox = document.createElement('div');
     myUnderBox.setAttribute('id',('u'+numberOfBoxes).toString());
-    myUnderBox.style.cssText = "width: 110px; height:110px; background: none; position: absolute; border:none; overflow:hidden";
+    myUnderBox.style.cssText = "width: 110px; height:110px; background: black; position: absolute; border:none; overflow:hidden";
     myUnderBox.setAttribute('onmouseenter','onHoverUnderBox()');
     myUnderBox.setAttribute('onmousedown', 'handleMouseDownResize(event)');
 
-    myUnderTriangle = document.createElement('div');
-    myUnderTriangle.setAttribute('id',('t'+numberOfBoxes).toString());
-    myUnderTriangle.style.cssText = "background: black; position: absolute; border:none;";
-    myUnderTriangle.style.width = '200px';
-    myUnderTriangle.style.height = '200px';
-    myUnderTriangle.style.transform = 'rotate(45deg) translate(-86%,0)';
-
-    myUnderBox.appendChild(myUnderTriangle);
+    // myUnderTriangle = document.createElement('div');
+    // myUnderTriangle.setAttribute('id',('t'+numberOfBoxes).toString());
+    // myUnderTriangle.style.cssText = "background: black; position: absolute; border:none;";
+    // myUnderTriangle.style.width = '200px';
+    // myUnderTriangle.style.height = '200px';
+    // myUnderTriangle.style.transform = 'rotate(45deg) translate(-86%,0)';
+    //
+    // myUnderBox.appendChild(myUnderTriangle);
 
     myButton = document.createElement('button');
     myButton.setAttribute('id',('b'+numberOfBoxes++).toString());
     myButton.setAttribute('onmousedown', 'handleMouseDownRotate(this.id)');
     myButton.style.cssText = "width: 30px; height: 30px; position:absolute; border-radius:50%;";
-    myButton.style.left= 40  + 'px';
-    myButton.style.top= 135+ 'px';
+    myButton.style.left= wrapperForStylePx(40);
+    myButton.style.top= wrapperForStylePx(135);
 
     let boxContainer = document.getElementById("boxContainer");
     boxContainer.appendChild(myUnderBox);
@@ -101,38 +113,23 @@ function addNewBox() {
     boxContainer.appendChild(myBox);
 }
 
-function handleMouseDownRotate(id){
-    id=id.slice(1);
-    currentID = id;
-    myBox = document.getElementById(id);
-    myButton = document.getElementById('b'+id);
-    myUnderBox = document.getElementById('u'+id);
-    document.onmousemove = rotate;
-}
-
 function wrapperForStylePx(size){
     return (size + 'px');
 }
 
 function handleMouseMove(event) {
-    xAxis=event.pageX;
-    yAxis=event.pageY;
-
-    myBox.style.left=wrapperForStylePx(xAxis-startingMouseInsideX+5);//x;
-    myBox.style.top=wrapperForStylePx(yAxis-startingMouseInsideY+5);//y;
+    myBox.style.left=wrapperForStylePx(event.pageX-startingMouseInsideX+5);//x;
+    myBox.style.top=wrapperForStylePx(event.pageY-startingMouseInsideY+5);//y;
 
     reCenterMyButton();
 
-    myUnderBox.style.left=wrapperForStylePx(xAxis-startingMouseInsideX);
-    myUnderBox.style.top=wrapperForStylePx(yAxis-startingMouseInsideY);
+    myUnderBox.style.left=wrapperForStylePx(event.pageX-startingMouseInsideX);
+    myUnderBox.style.top=wrapperForStylePx(event.pageY-startingMouseInsideY);
 }
 
 function handleMouseDownBox(event) {
     currentID = event.target.id;
-    console.log(currentID)
-    myBox = document.getElementById(currentID);
-    myButton = document.getElementById('b'+currentID);
-    myUnderBox = document.getElementById('u'+currentID);
+    updateElements();
 
     startingMouseX = event.pageX; //where Mouse Starts Dragging From
     startingMouseY = event.pageY; //where Mouse Starts Dragging From
