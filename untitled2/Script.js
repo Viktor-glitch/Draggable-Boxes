@@ -23,12 +23,6 @@ let bottomResize;
 let leftResize;
 let boxTop;
 let boxLeft;
-let underBoxTop;
-let underBoxLeft;
-let centerX;
-let centerY;
-let centerXDifference;
-let centerYDifference;
 
 function rotate(event){
     let delta_x = event.pageX - (Number(myBox.style.left.slice(0,-2)) + Number(myBox.style.width.slice(0,-2))/2);//touch_x - center_x
@@ -57,77 +51,116 @@ function handleMouseDownRotate(id){
 
     document.onmousemove = rotate;
 }
+function myResizeFunctionTop(event){
+    myUnderBox.style.top = wrapperForStylePx(boxTop + (event.pageY - startingMouseY));
+    myBox.style.top = wrapperForStylePx(boxTop + (event.pageY - startingMouseY)+5);
+    myResizeFunctionGeneral(0,-1,event);
+}
+
+function myResizeFunctionRight(event){
+    myResizeFunctionGeneral(1,0,event);
+}
+function myResizeFunctionBottom(event){
+    myResizeFunctionGeneral(0,1,event);
+}
+function myResizeFunctionLeft(event){
+    myUnderBox.style.left = wrapperForStylePx(boxLeft + (event.pageX - startingMouseX));
+    myBox.style.left = wrapperForStylePx(boxLeft + (event.pageX - startingMouseX)+5);
+    myResizeFunctionGeneral(-1,0,event);
+}
 
 function reCenterMyButton(){
     myButton.style.left = wrapperForStylePx( Number(myBox.style.left.slice(0,-2)) -15 + Number((myBox.style.width.slice(0,-2)))/2 );
     myButton.style.top= wrapperForStylePx(1.35 * myBox.style.height.slice(0,-2) + Number(myBox.style.top.slice(0,-2)));
 }
 
-function onHoverUnderBox(){
-    myUnderBox.style.cursor= 'nwse-resize';
+function myResizeFunctionTopLeft(event) {
+    myUnderBox.style.left = wrapperForStylePx(boxLeft + (event.pageX - startingMouseX));
+    myUnderBox.style.top = wrapperForStylePx(boxTop + (event.pageY - startingMouseY));
+
+    myBox.style.left = wrapperForStylePx(boxLeft + (event.pageX - startingMouseX)+5);
+    myBox.style.top = wrapperForStylePx(boxTop + (event.pageY - startingMouseY)+5);
+
+    myResizeFunctionGeneral(-1,-1,event);
 }
-function onHoverUnderBox(){
-    myUnderBox.style.cursor= 'nwse-resize';
-}
-function onHoverUnderBox(){
-    myUnderBox.style.cursor= 'nwse-resize';
+
+function myResizeFunctionBottomRight(event) {
+    myResizeFunctionGeneral(1,1,event);
 }
 
-function myResizeFunction(event) {
-    // myBox.style.width=wrapperForStylePx(width-(event.pageX-startingMouseX) -10);//x;
-    // myBox.style.height=wrapperForStylePx(height-(event.pageY-startingMouseY) -10);//y;
-    //
-    // // myBox.style.top =  wrapperForStylePx(boxLeft-(event.pageX-startingMouseX));
-    // // myBox.style.left =  wrapperForStylePx(boxTop-(event.pageY-startingMouseY));
-    // //
-    // // myUnderBox.style.top =  wrapperForStylePx(underBoxLeft-(startingMouseX-event.pageX));
-    // // myUnderBox.style.left =  wrapperForStylePx(underBoxTop-(startingMouseY-event.pageY));
-    //
-    // myUnderBox.style.width = wrapperForStylePx(width-(event.pageX-startingMouseX));
-    // myUnderBox.style.height = wrapperForStylePx(height-(event.pageY-startingMouseY));
+function myResizeFunctionTopRight(event) {
+    myUnderBox.style.top = wrapperForStylePx(boxTop + (event.pageY - startingMouseY));
 
-    console.log('I am trying to change width');
+    myBox.style.top = wrapperForStylePx(boxTop + (event.pageY - startingMouseY)+5);
 
-    console.log('Xdiff= ' + centerXDifference + 'mouseXPos = ' + event.pageX);
-    console.log("diff between mice" + (startingMouseX -event.pageX));
+    myResizeFunctionGeneral(1,-1,event);
+}
 
-    let movementX = centerX -event.pageX;
-    let movementY = centerY -event.pageY;
+function myResizeFunctionBottomLeft(event) {
+    myUnderBox.style.left = wrapperForStylePx(boxLeft + (event.pageX - startingMouseX));
 
-    myUnderBox.style.width = wrapperForStylePx(width - (event.pageX - startingMouseX));
-    myUnderBox.style.height = wrapperForStylePx(height - (event.pageY - startingMouseY));
+    myBox.style.left = wrapperForStylePx(boxLeft + (event.pageX - startingMouseX)+5);
+
+    myResizeFunctionGeneral(-1,1,event);
+}
+
+function myResizeFunctionGeneral(x, y,event){
+    myBox.style.width = wrapperForStylePx(width + x * (event.pageX - startingMouseX)-10);
+    myBox.style.height = wrapperForStylePx(height + y * (event.pageY - startingMouseY)-10);
+
+    myUnderBox.style.width = wrapperForStylePx(width + x * (event.pageX - startingMouseX));
+    myUnderBox.style.height = wrapperForStylePx(height + y * (event.pageY - startingMouseY));
 
     reCenterMyButton();
 }
 
-function handleMouseDownResizeTopLeft(event){
-    currentID = event.target.id.slice(7);
+function handleMouseDownResize(event){
+    currentID = event.target.id;
+    if(currentID.includes('TopRight')){
+        currentID = event.target.id.slice(8);
+        findTheRightFunctionAndResize(event);
+        document.onmousemove=myResizeFunctionTopRight;
+    }else if(currentID.includes('BottomRight')){
+        currentID = event.target.id.slice(11);
+        findTheRightFunctionAndResize(event);
+        document.onmousemove=myResizeFunctionBottomRight;
+    }else if(currentID.includes('TopLeft')){
+        currentID = event.target.id.slice(7);
+        findTheRightFunctionAndResize(event);
+        document.onmousemove=myResizeFunctionTopLeft;
+    }else if(currentID.includes('BottomLeft')){
+        currentID = event.target.id.slice(10);
+        findTheRightFunctionAndResize(event);
+        document.onmousemove=myResizeFunctionBottomLeft;
+    }else if(currentID.includes('Top')){
+        currentID = event.target.id.slice(3);
+        findTheRightFunctionAndResize(event);
+        document.onmousemove=myResizeFunctionTop;
+    }else if(currentID.includes('Right')){
+        currentID = event.target.id.slice(5);
+        findTheRightFunctionAndResize(event);
+        document.onmousemove=myResizeFunctionRight;
+    }else if(currentID.includes('Bottom')){
+        currentID = event.target.id.slice(6);
+        findTheRightFunctionAndResize(event);
+        document.onmousemove=myResizeFunctionBottom;
+    }else{
+        currentID = event.target.id.slice(4);
+        findTheRightFunctionAndResize(event);
+        document.onmousemove=myResizeFunctionLeft;
+    }
+}
+function findTheRightFunctionAndResize(event){
     updateElements();
+
     startingMouseX = event.pageX; //where Mouse Starts Dragging From
     startingMouseY = event.pageY; //where Mouse Starts Dragging From
 
-    boxTop =Number(myBox.style.top.slice(0,-2));
-    boxLeft =Number(myBox.style.left.slice(0,-2));
-
-    underBoxTop =Number(myUnderBox.style.top.slice(0,-2));
-    underBoxLeft =Number(myUnderBox.style.left.slice(0,-2));
-
-    centerX = (Number(myUnderBox.style.left.slice(0,-2)) + Number(myUnderBox.style.left.slice(0,-2))/2);
-    centerY = (Number(myUnderBox.style.top.slice(0,-2)) + Number(myUnderBox.style.height.slice(0,-2))/2);
-    centerXDifference= Math.abs(centerX-startingMouseX);
-    centerYDifference = Math.abs(centerY-startingMouseY);
-
-
+    boxTop =Number(myUnderBox.style.top.slice(0,-2));
+    boxLeft =Number(myUnderBox.style.left.slice(0,-2));
 
     width = Number(myUnderBox.style.width.slice(0,-2));
     height = Number(myUnderBox.style.height.slice(0,-2));
-
-    myUnderBox.style.right = wrapperForStylePx(-boxLeft-width);
-    myUnderBox.style.bottom = wrapperForStylePx(-boxTop-height);
-    myUnderBox.style.left = 'auto';
-    myUnderBox.style.top = 'auto';
-
-    document.onmousemove=myResizeFunction;
 }
 
 function updateElements(){
@@ -147,51 +180,57 @@ function addNewBox() {
     myUnderBox = document.createElement('div');
     myUnderBox.setAttribute('id',('underBox'+numberOfBoxes).toString());
     myUnderBox.style.cssText = "width: 110px; height:110px; background: black; position: relative; border:none;";
-    myUnderBox.setAttribute('onmouseenter','onHoverUnderBox()');
-
 
     cornerResizeTopLeft = document.createElement('div');
     cornerResizeTopLeft.setAttribute('id','TopLeft'+numberOfBoxes);
-    cornerResizeTopLeft.style.cssText = "width: 10px; height:10px; background: green; position: absolute; top:0; left: 0; border:none; z-index:1;";
+    cornerResizeTopLeft.style.cssText = "width: 20px; height:20px; cursor: nwse-resize; border-radius:50%; background: none; position: absolute; top:-5px; left: -5px; border:none; z-index:1;";
 
     cornerResizeTopRight = document.createElement('div');
     cornerResizeTopRight.setAttribute('id','TopRight'+numberOfBoxes);
-    cornerResizeTopRight.style.cssText = "width: 10px; height:10px; background: green; position: absolute; top:0; right: 0; border:none; z-index:1;";
+    cornerResizeTopRight.style.cssText = "width: 20px; cursor: nesw-resize; height:20px; border-radius:50%; background: none; position: absolute; top:-5px; right: -5px; border:none; z-index:1;";
 
     cornerResizeBottomRight = document.createElement('div');
     cornerResizeBottomRight.setAttribute('id','BottomRight'+numberOfBoxes);
-    cornerResizeBottomRight.style.cssText = "width: 10px; height:10px; background: green; position: absolute; bottom:0; right: 0; border:none; z-index:1;";
+    cornerResizeBottomRight.style.cssText = "width: 20px; height:20px; cursor: nwse-resize; border-radius:50%; background: none; position: absolute; bottom:-5px; right: -5px; border:none; z-index:1;";
 
     cornerResizeBottomLeft = document.createElement('div');
     cornerResizeBottomLeft.setAttribute('id','BottomLeft'+numberOfBoxes);
-    cornerResizeBottomLeft.style.cssText = "width: 10px; height:10px; background: green; position: absolute; bottom:0; left: 0; border:none; z-index:1;";
+    cornerResizeBottomLeft.style.cssText = "width: 20px; height:20px; cursor: nesw-resize; border-radius:50%; background: none; position: absolute; bottom:-5px; left: -5px; border:none; z-index:1;";
 
     topResize = document.createElement('div');
     topResize.setAttribute('id','Top' + numberOfBoxes);
-    topResize.style.cssText = "width: 100%; height:10px; background: red; position: absolute; top:0; border:none;";
+    topResize.style.cssText = "width: 100%; height:10px;cursor: ns-resize; background: red; position: absolute; top:0; border:none;";
 
     rightResize = document.createElement('div');
-    rightResize.setAttribute('id','Resize' + numberOfBoxes);
-    rightResize.style.cssText = "height: 100%; width:10px; background: red; position: absolute; right:0; border:none;";
+    rightResize.setAttribute('id','Right' + numberOfBoxes);
+    rightResize.style.cssText = "height: 100%; width:10px; cursor: ew-resize;background: red; position: absolute; right:0; border:none;";
 
     bottomResize = document.createElement('div');
-    bottomResize.setAttribute('id','Resize' + numberOfBoxes);
-    bottomResize.style.cssText = "width: 100%; height:10px; background: red; position: absolute; bottom:0; border:none;";
+    bottomResize.setAttribute('id','Bottom' + numberOfBoxes);
+    bottomResize.style.cssText = "width: 100%; height:10px;cursor: ns-resize; background: red; position: absolute; bottom:0; border:none;";
 
     leftResize = document.createElement('div');
-    leftResize.setAttribute('id','Resize' + numberOfBoxes);
-    leftResize.style.cssText = "height: 100%; width:10px; background: red; position: absolute; left:0; border:none;";
+    leftResize.setAttribute('id','Left' + numberOfBoxes);
+    leftResize.style.cssText = "height: 100%; width:10px;cursor: ew-resize; background: red; position: absolute; left:0; border:none;";
 
     myUnderBox.appendChild(cornerResizeTopLeft);
     myUnderBox.appendChild(cornerResizeTopRight);
     myUnderBox.appendChild(cornerResizeBottomRight);
     myUnderBox.appendChild(cornerResizeBottomLeft);
-    // myUnderBox.appendChild(topResize);
-    // myUnderBox.appendChild(rightResize);
-    // myUnderBox.appendChild(bottomResize);
-    // myUnderBox.appendChild(leftResize);
+    myUnderBox.appendChild(topResize);
+    myUnderBox.appendChild(rightResize);
+    myUnderBox.appendChild(bottomResize);
+    myUnderBox.appendChild(leftResize);
 
-    cornerResizeTopLeft.setAttribute('onmousedown', 'handleMouseDownResizeTopLeft(event)');
+    cornerResizeTopLeft.setAttribute('onmousedown', 'handleMouseDownResize(event)');
+    cornerResizeTopRight.setAttribute('onmousedown', 'handleMouseDownResize(event)');
+    cornerResizeBottomRight.setAttribute('onmousedown', 'handleMouseDownResize(event)');
+    cornerResizeBottomLeft.setAttribute('onmousedown', 'handleMouseDownResize(event)');
+    topResize.setAttribute('onmousedown', 'handleMouseDownResize(event)');
+    rightResize.setAttribute('onmousedown', 'handleMouseDownResize(event)');
+    bottomResize.setAttribute('onmousedown', 'handleMouseDownResize(event)');
+    leftResize.setAttribute('onmousedown', 'handleMouseDownResize(event)');
+
 
 
     myButton = document.createElement('button');
