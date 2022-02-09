@@ -43,7 +43,7 @@ function getCurrentRotation(el) {
     "none";
     if (tm != "none") {
         var values = tm.split('(')[1].split(')')[0].split(',');
-        var angle = Math.round(Math.atan2(values[1], values[0]) * (180 / Math.PI));
+        var angle = Math.round(Math.atan2(Number(values[1]), Number(values[0])) * (180 / Math.PI));
         return (angle < 0 ? angle + 360 : angle);
     }
     return 0;
@@ -79,7 +79,7 @@ function rotate(event){
         mousePressY = event.clientY;
 
 
-        var arrow = boxWrapper;
+        var arrow = myUnderBox;
         var arrowRects = arrow.getBoundingClientRect();
         var arrowX = arrowRects.left + arrowRects.width / 2;
         var arrowY = arrowRects.top + arrowRects.height / 2;
@@ -88,8 +88,6 @@ function rotate(event){
             var angle = Math.atan2(event.clientY - arrowY, event.clientX - arrowX) + Math.PI / 2;
             rotateBox(angle * 180 / Math.PI);
         }
-
-
 
         window.addEventListener('mousemove', eventMoveHandler, false);
 
