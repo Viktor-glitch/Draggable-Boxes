@@ -8,8 +8,22 @@
 </head>
 <body >
     <button onclick="addNewBox()" style="height:20px; width:30px; position:absolute; right:0;">Add new box</button>
-    <div id="boxContainer">
+    <div id="boxContainer" onclick="handleOnClickDeselect()">
 
+    </div>
+    <div id="Edit" style=" ">
+        <div class="row1" style="display:flex; ">
+            <p>border-style</p>
+            <input id = 'text' type="text" >
+        </div>
+        <div class="row2" style="display:flex; ">
+            <p>border-color</p>
+            <input id= 'borderColor'type="color">
+        </div>
+        <div class="row3" style="display:flex; ">
+            <p>background-color</p>
+            <input id= 'backgroundColor'type="color">
+        </div>
     </div>
 </body>
 </html>

@@ -1,4 +1,5 @@
 document.onmouseup = handleMouseUp;
+
 let highestZIndex = 0;
 let currentID = '0';
 let numberOfBoxes = 0;
@@ -32,6 +33,21 @@ let initY;
 let mousePressX;
 let mousePressY;
 let myMoveButton;
+
+function isChildOf(child, parent) {
+    if (child.parentNode === parent) {
+        return true;
+    } else if (child.parentNode === null) {
+        return false;
+    } else {
+        return isChildOf(child.parentNode, parent);
+    }
+}
+function handleOnClickDeselect(){
+    if(!isChildOf(event.target,document.getElementById('boxContainer'))) {
+        document.getElementById('Edit').style.display = 'none';
+    }
+}
 
 function getCurrentRotation(el) {
     var st = window.getComputedStyle(el, null);
@@ -72,29 +88,27 @@ function rotate(event){
     //
     // theta_radians+=Number(startingRotationValue)-1.570796;
 
+    initX = this.offsetLeft;
+    initY = this.offsetTop;
+    mousePressX = event.clientX;
+    mousePressY = event.clientY;
 
-        initX = this.offsetLeft;
-        initY = this.offsetTop;
-        mousePressX = event.clientX;
-        mousePressY = event.clientY;
+    var arrow = myUnderBox;
+    var arrowRects = arrow.getBoundingClientRect();
+    var arrowX = arrowRects.left + arrowRects.width / 2;
+    var arrowY = arrowRects.top + arrowRects.height / 2;
 
+    function eventMoveHandler(event) {
+        var angle = Math.atan2(event.clientY - arrowY, event.clientX - arrowX) + Math.PI / 2;
+        rotateBox(angle * 180 / Math.PI);
+    }
 
-        var arrow = myUnderBox;
-        var arrowRects = arrow.getBoundingClientRect();
-        var arrowX = arrowRects.left + arrowRects.width / 2;
-        var arrowY = arrowRects.top + arrowRects.height / 2;
+    window.addEventListener('mousemove', eventMoveHandler, false);
 
-        function eventMoveHandler(event) {
-            var angle = Math.atan2(event.clientY - arrowY, event.clientX - arrowX) + Math.PI / 2;
-            rotateBox(angle * 180 / Math.PI);
-        }
-
-        window.addEventListener('mousemove', eventMoveHandler, false);
-
-        window.addEventListener('mouseup', function eventEndHandler() {
-            window.removeEventListener('mousemove', eventMoveHandler, false);
-            window.removeEventListener('mouseup', eventEndHandler);
-        }, false);
+    window.addEventListener('mouseup', function eventEndHandler() {
+        window.removeEventListener('mousemove', eventMoveHandler, false);
+        window.removeEventListener('mouseup', eventEndHandler);
+    }, false);
 
 
     // myButton.style.transform = "rotate(" + theta_radians + "rad)";
@@ -108,8 +122,10 @@ function handleMouseDownRotate(id){
 }
 
 function reCenterMyButton(){
-    myButton.style.left = wrapperForStylePx( Number(myUnderBox.style.left.slice(0,-2)) -15 + Number((myUnderBox.style.width.slice(0,-2)))/2 );
-    myButton.style.top= wrapperForStylePx(1.35 * myUnderBox.style.height.slice(0,-2) + Number(myUnderBox.style.top.slice(0,-2)));
+    myButton.style.left = wrapperForStylePx(Number(boxWrapper.style.left.slice(0,-2)) + Number((boxWrapper.style.width.slice(0,-2)))/2 - 100);
+    myButton.style.top= wrapperForStylePx(Number(boxWrapper.style.height.slice(0,-2))/2 + Number(boxWrapper.style.top.slice(0,-2))+30);
+    myMoveButton.style.left = wrapperForStylePx(Number(boxWrapper.style.left.slice(0,-2)) + Number((boxWrapper.style.width.slice(0,-2)))/2 - 60);
+    myMoveButton.style.top= wrapperForStylePx(Number(boxWrapper.style.height.slice(0,-2))/2 + Number(boxWrapper.style.top.slice(0,-2))+30);
 }
 
 function handleMouseDownResize(event, left = false, top = false, xResize = false, yResize = false){
@@ -140,9 +156,9 @@ function rotateBox(deg) {
 }
 
 function findTheRightFunctionAndResize(event, left = false, top = false, xResize = false, yResize = false){
-     initX = boxWrapper.offsetLeft;
-     initY = boxWrapper.offsetTop;
-     mousePressX = event.clientX;
+    initX = boxWrapper.offsetLeft;
+    initY = boxWrapper.offsetTop;
+    mousePressX = event.clientX;
     mousePressY = event.clientY;
 
     let initW = myUnderBox.offsetWidth;
@@ -198,6 +214,7 @@ function findTheRightFunctionAndResize(event, left = false, top = false, xResize
 
         resize(newW, newH);
         repositionElement(newX, newY);
+        reCenterMyButton();
     }
 
     window.addEventListener('mousemove', eventMoveHandler, false);
@@ -208,28 +225,42 @@ function findTheRightFunctionAndResize(event, left = false, top = false, xResize
 }
 
 function updateElements(){
-    console.log("I updated the elements!");
     boxWrapper = document.getElementById('BoxWrapper'+ currentID);
     myMoveButton = document.getElementById('MoveButton'+currentID);
     myButton = document.getElementById('rotateButton'+currentID);
     myUnderBox = document.getElementById('underBox'+currentID);
+    getValueBackgroundColor();
+    getValueBorderStyle();
+    getValueBorderColor();
 }
-
+function getValueBorderStyle(){
+    document.getElementById('text').value=myUnderBox.style.borderStyle;
+}
+function getValueBackgroundColor() {
+    if (document.getElementById('backgroundColor').value) {
+        document.getElementById('backgroundColor').value = myUnderBox.style.backgroundColor;
+    }
+}
+function getValueBorderColor(){
+    document.getElementById('borderColor').value=myUnderBox.style.borderColor;
+}
 function addNewBox() {
+
     boxWrapper = document.createElement('div');
     boxWrapper.setAttribute('id','BoxWrapper'+(numberOfBoxes).toString());
     boxWrapper.style.cssText = "width: 110px; height:110px; left: 100px; top:100px;position: absolute; transform-origin: top left;";
 
-    myMoveButton = document.createElement('div');
+    myMoveButton = document.createElement('button');
     myMoveButton.setAttribute('id','MoveButton'+(numberOfBoxes).toString());
     myMoveButton.setAttribute('onmousedown', "handleMouseDownButton(event)");
-    myMoveButton.style.cssText = "width: 30px; height: 30px; position:absolute; border-radius:50%;";
+    myMoveButton.style.cssText = "width: 30px; height: 30px; cursor:move; position:absolute; border-radius:50%;";
     myMoveButton.style.left= wrapperForStylePx(70);
     myMoveButton.style.top= wrapperForStylePx(135);
 
     myUnderBox = document.createElement('div');
     myUnderBox.setAttribute('id',('underBox'+numberOfBoxes).toString());
-    myUnderBox.style.cssText = "width: 110px; height:110px; background: none; position: relative; border:solid; border-color:black; border-width:1px;transform: translate(-50%, -50%);";
+    myUnderBox.style.cssText = "width: 110px; height:110px; background: white; position: relative; border:solid; border-color:black; border-width:1px;transform: translate(-50%, -50%);";
+    myUnderBox.setAttribute('onclick', 'handleUnderBoxDownButton(event)');
 
     myButton = document.createElement('button');
     myButton.setAttribute('id',('rotateButton'+numberOfBoxes).toString());
@@ -238,11 +269,25 @@ function addNewBox() {
     myButton.style.left= wrapperForStylePx(20);
     myButton.style.top= wrapperForStylePx(135);
 
-    let table = document.createElement('table');
-    let row1 = document.createElement('tr');
-    let row2 = document.createElement('tr');
-    let row3 = document.createElement('tr');
-    let 
+// <svg height="500" width="500">
+//         <polygon points="250,60 100,400 400,400" class="triangle" />
+//         </svg>
+
+    var svg = document.createElementNS("http://www.w3.org/2000/svg",'svg');
+    svg.setAttribute('class','svg');
+    var rect = document.createElementNS("http://www.w3.org/2000/svg",'rect');
+    rect.setAttribute('class','polygon');
+    svg.appendChild(rect);
+    svg.style.cssText = 'width:100%; height:100%; viewBox= " 0 0 100 100"';
+    rect.setAttribute("x", "50%");
+    rect.setAttribute("y", "50%");
+    rect.setAttribute("width", "100");
+    rect.setAttribute("height", "100");
+    rect.setAttribute("fill", "#5cceee");
+
+    myUnderBox.appendChild(svg);
+
+    reCenterMyButton();
 
     cornerResizeTopLeft = document.createElement('div');
     cornerResizeTopLeft.setAttribute('id','TopLeft'+numberOfBoxes);
@@ -305,6 +350,20 @@ function addNewBox() {
     boxContainer.appendChild(boxWrapper);
     boxContainer.appendChild(myButton);
     boxContainer.appendChild(myMoveButton);
+
+    let colorPickerBackground = document.getElementById('backgroundColor');
+    let colorPickerBorder = document.getElementById('borderColor');
+
+    getValueBackgroundColor();
+    getValueBorderStyle();
+    getValueBorderColor();
+
+    setInterval(()=>{
+        if(document.getElementById('Edit').style.display == 'block') {
+            myUnderBox.style.borderColor = colorPickerBorder.value;
+            myUnderBox.style.backgroundColor = colorPickerBackground.value;
+        }
+    }, 200);
 }
 
 function wrapperForStylePx(size){
@@ -316,24 +375,31 @@ function onHoverBox(){
 }
 
 function handleMouseMove(event) {
-    boxWrapper.style.left=wrapperForStylePx(event.pageX-startingMouseInsideX);
-    boxWrapper.style.top=wrapperForStylePx(event.pageY-startingMouseInsideY);
-
+    boxWrapper.style.left=wrapperForStylePx(startingMouseInsideX+event.pageX-startingMouseX);
+    boxWrapper.style.top=wrapperForStylePx(startingMouseInsideY+event.pageY-startingMouseY);
 
     reCenterMyButton();
-
-    // myUnderBox.style.left=wrapperForStylePx(event.pageX-startingMouseInsideX);
-    // myUnderBox.style.top=wrapperForStylePx(event.pageY-startingMouseInsideY);
 }
+function handleUnderBoxDownButton(event){
+    if(currentID.includes('UnderBox'))
+        currentID = event.target.id.slice(8);
+    updateElements();
 
+    boxWrapper.style.zIndex=(highestZIndex + 1).toString();
+    myButton.style.zIndex=(highestZIndex + 1).toString();
+    myUnderBox.style.zIndex=(highestZIndex + 1).toString();
+    myMoveButton.style.zIndex=(highestZIndex+=1).toString();
+
+    document.getElementById('Edit').style.display = 'block';
+}
 function handleMouseDownButton(event) {
     currentID = event.target.id.slice(10);
     updateElements();
 
     startingMouseX = event.pageX; //where Mouse Starts Dragging From
     startingMouseY = event.pageY; //where Mouse Starts Dragging From
-    startingMouseInsideX = Number(startingMouseX-Number(myMoveButton.style.left.slice(0,-2)));
-    startingMouseInsideY = Number(startingMouseY-Number(myMoveButton.style.top.slice(0,-2)));
+    startingMouseInsideX = Number(boxWrapper.style.left.slice(0,-2));
+    startingMouseInsideY = Number(boxWrapper.style.top.slice(0,-2));
 
     boxWrapper.style.zIndex=(highestZIndex + 1).toString();
     myButton.style.zIndex=(highestZIndex + 1).toString();
