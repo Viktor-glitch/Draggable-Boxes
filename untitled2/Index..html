@@ -7,9 +7,36 @@
     <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body >
-    <button onclick="addNewBox()" style="height:20px; width:30px; position:absolute; right:0;">Add new box</button>
-    <div id="boxContainer" onclick="handleOnClickDeselect()">
 
+    <div id="boxContainer" onclick="handleOnClickDeselect()">
+    <nav>
+        <button id="addSquareButton" onclick="addSquare()" >
+            <svg viewBox=" -9 -4 100 100">
+                <rect width="80px" height="80px"/>
+            </svg>
+        </button>
+        <button id="addTriangleButton" onclick="addTriangle()">
+            <svg viewBox=" -10 0 100 100">
+                <polygon points="0,80 80,80 40,0" class="triangle" />
+            </svg>
+        </button>
+        <button id="addCircleButton" onclick="addCircle()">
+            <svg viewBox=" 0 6 100 100">
+                <circle cx='50%' cy="50%" width="80px" height="80px" r="40px"/>
+            </svg>
+        </button>
+        <button id="addImgButton" onclick="addImg()">
+            Image
+        </button>
+        <button id="addTextButton" onclick="addText()">
+            Text
+        </button>
+        <button onclick="addNewBox()" style="height:100%; width:100%; ">
+            <svg viewBox="-13 -9 100 100">
+                <polygon points="0,30 0,40 30,40 30,70 40,70 40,40 70,40 70,30 40,30 40,0 30,0 30,30"></polygon>
+            </svg>
+        </button>
+    </nav>
     </div>
     <div id="Edit" style=" ">
         <div class="row1" style="display:flex; ">
@@ -18,11 +45,11 @@
         </div>
         <div class="row2" style="display:flex; ">
             <p>border-color</p>
-            <input id= 'borderColor'type="color">
+            <input id= 'borderColor'type="color" onclick="enableBorderPicker()">
         </div>
         <div class="row3" style="display:flex; ">
             <p>background-color</p>
-            <input id= 'backgroundColor'type="color">
+            <input id= 'backgroundColor'type="color" onclick="enableBackgroundPicker()">
         </div>
     </div>
 </body>
