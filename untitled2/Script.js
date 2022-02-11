@@ -34,6 +34,7 @@ let colorPickerBackground;
 let colorPickerBorder;
 let colorPickerBackgroundEnable = false;
 let colorPickerBorderEnable = false;
+let fontSizeChanger = false;
 let initRotate = 0 ;
 
 function isChildOf(child, parent) {
@@ -257,17 +258,20 @@ function updateElements(){
     getValueBorderColor();
     initRotate = getCurrentRotation(boxWrapper);
 }
+
 function getValueBorderStyle(){
     document.getElementById('text').value=myUnderBox.style.borderStyle;
 }
+
 function getValueBackgroundColor() {
     if(myUnderBox.style.backgroundColor==='none'){
         document.getElementById('backgroundColor').value = '#FFFFFF';
     } else {
         document.getElementById('backgroundColor').value = myUnderBox.style.backgroundColor;
     }
-
+    console.log(rgbToHex(myUnderBox.style.backgroundColor.slice(4,-1)));
 }
+
 function getValueBorderColor(){
     if(myUnderBox.style.backgroundColor==='none'){
         document.getElementById('borderColor').value = '#FFFFFF';
@@ -370,59 +374,11 @@ function addNewBox(shape) {
     } else if(shape == 4){
 
         var text = document.createElement('div');
-        text.style.cssText = 'width: 100%; height:100%;';
+        text.setAttribute('id','text' + currentID);
+        text.style.cssText = 'width: 100%; height:100%; font-size:30px; overflow:hidden;';
         text.setAttribute('contenteditable', 'true');
         myUnderBox.appendChild(text);
-    }
-
-    function f1() {
-        //function to make the text bold using DOM method
-        document.getElementById("textarea1").style.fontWeight = "bold";
-    }
-
-    function f2() {
-        //function to make the text italic using DOM method
-        document.getElementById("textarea1").style.fontStyle = "italic";
-    }
-
-    function f3() {
-        //function to make the text alignment left using DOM method
-        document.getElementById("textarea1").style.textAlign = "left";
-    }
-
-    function f4() {
-        //function to make the text alignment center using DOM method
-        document.getElementById("textarea1").style.textAlign = "center";
-    }
-
-    function f5() {
-        //function to make the text alignment right using DOM method
-        document.getElementById("textarea1").style.textAlign = "right";
-    }
-
-    function f6() {
-        //function to make the text in Uppercase using DOM method
-        document.getElementById("textarea1").style.textTransform = "uppercase";
-    }
-
-    function f7() {
-        //function to make the text in Lowercase using DOM method
-        document.getElementById("textarea1").style.textTransform = "lowercase";
-    }
-
-    function f8() {
-        //function to make the text capitalize using DOM method
-        document.getElementById("textarea1").style.textTransform = "capitalize";
-    }
-
-    function f9() {
-        //function to make the text back to normal by removing all the methods applied
-        //using DOM method
-        document.getElementById("textarea1").style.fontWeight = "normal";
-        document.getElementById("textarea1").style.textAlign = "left";
-        document.getElementById("textarea1").style.fontStyle = "normal";
-        document.getElementById("textarea1").style.textTransform = "capitalize";
-        document.getElementById("textarea1").value = " ";
+        text.setAttribute('onclick','handleTextAreaMouseDown(event)');
     }
 
     console.log(myUnderBox.style.width);
@@ -514,6 +470,14 @@ setInterval(() => {
     }
 }, 200);
 
+setInterval(() => {
+    if(fontSizeChanger) {
+        if (document.getElementById('Edit').style.display == 'block') {
+            document.getElementById('text'+currentID).style.fontSize = document.getElementById('fontSize').value;
+            console.log("dont look at me i am doing my part! The value i am trying to change is " + document.getElementById('fontSize').value);
+        }
+    }
+}, 200);
 function enableBackgroundPicker (){
     colorPickerBackgroundEnable = true;
 }
@@ -551,19 +515,44 @@ function handleMouseMove(event) {
 
     reCenterMyButton();
 }
+
+function getValueFontSize(){
+    return document.getElementById('text'+currentID).style.fontSize;
+}
+
+function handleTextAreaMouseDown(event){
+    if(event.target.id.includes('text')){
+        document.getElementById('fontSize').value=getValueFontSize();
+        document.getElementById('fontSettings').style.display='block';
+        fontSizeChanger=true;
+        console.log('I am trying to change the font now! soo fontSizeChanger is '+ fontSizeChanger);
+    }
+}
+function componentToHex(c) {
+    var hex = c.toString(16);
+    return hex.length == 1 ? "0" + hex : hex;
+}
+
+function rgbToHex(r, g, b) {
+    return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+}
 function handleUnderBoxDownButton(event){
     if(currentID.includes('UnderBox'))
         currentID = event.target.id.slice(8);
-    getValueBackgroundColor();
     updateElements();
+    getValueBackgroundColor();
 
     boxWrapper.style.zIndex=(highestZIndex + 1).toString();
     myButton.style.zIndex=(highestZIndex + 1).toString();
     myUnderBox.style.zIndex=(highestZIndex + 1).toString();
     myMoveButton.style.zIndex=(highestZIndex+=1).toString();
 
+    if(!event.target.id.includes('text'))
+        document.getElementById('fontSettings').style.display='none';
+
     document.getElementById('Edit').style.display = 'block';
 }
+
 function handleMouseDownButton(event) {
     currentID = event.target.id.slice(10);
     getValueBackgroundColor();

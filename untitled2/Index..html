@@ -38,18 +38,24 @@
         </button>
     </nav>
     </div>
-    <div id="Edit" style=" ">
-        <div class="row1" style="display:flex; ">
+    <div id="Edit" >
+        <div class="row1" style="display: flex; align-items: center; ">
             <p>border-style</p>
             <input id = 'text' type="text" >
         </div>
-        <div class="row2" style="display:flex; ">
+        <div class="row2" style="display: flex; align-items: center; ">
             <p>border-color</p>
             <input id= 'borderColor'type="color" onclick="enableBorderPicker()">
         </div>
-        <div class="row3" style="display:flex; ">
+        <div class="row3" style="display: flex; align-items: center; ">
             <p>background-color</p>
             <input id= 'backgroundColor'type="color" onclick="enableBackgroundPicker()">
+        </div>
+        <div id="fontSettings" style="display:none;">
+            <div class="fontSize" style="display: flex; align-items: center; ">
+                <p>font-size</p>
+                <input id="fontSize" type="text">
+            </div>
         </div>
     </div>
 </body>
