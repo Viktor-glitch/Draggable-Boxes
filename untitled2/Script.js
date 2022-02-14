@@ -1,5 +1,5 @@
 document.onmouseup = handleMouseUp;
-
+let currentIdUncut
 let highestZIndex = 0;
 let currentID = '0';
 let numberOfBoxes = 0;
@@ -120,6 +120,7 @@ function rotate(event){
     // myUnderBox.style.transform = "rotate(" + theta_radians + "rad)";
 }
 function handleMouseDownRotate(id){
+    currentIdUncut=id;
     id=id.slice(12);
     currentID = id;
     updateElements();
@@ -135,6 +136,7 @@ function reCenterMyButton(){
 
 function handleMouseDownResize(event, left = false, top = false, xResize = false, yResize = false){
     currentID = event.target.id;
+    currentIdUncut = event.target.id;
     if(currentID.includes('TopRight')){
         currentID = event.target.id.slice(8);
     }else if(currentID.includes('BottomRight')){
@@ -171,7 +173,6 @@ function findTheRightFunctionAndResize(event, left = false, top = false, xResize
 
     initRotate = getCurrentRotation(boxWrapper);
     var initRadians = initRotate * Math.PI / 180;
-    console.log(initRotate);
     var cosFraction = Math.cos(initRadians);
     var sinFraction = Math.sin(initRadians);
     function eventMoveHandler(event) {
@@ -228,7 +229,9 @@ function findTheRightFunctionAndResize(event, left = false, top = false, xResize
         }
 
         resize(newW, newH);
-        // document.getElementById('tria'+currentID).setAttribute('points','0,' + newH + ' ' + newW + ',' + newH + ' ' + newW/2 +',0');
+        //
+        if(document.getElementById('tria' + currentID))
+            document.getElementById('tria'+currentID).setAttribute('points','0,' + newH + ' ' + newW + ',' + newH + ' ' + newW/2 +',0');
         repositionElement(newX, newY);
         reCenterMyButton();
     }
@@ -244,8 +247,9 @@ function componentToHex(c) {
     return hex.length == 1 ? "0" + hex : hex;
 }
 
-function rgbToHex(r, g, b) {
-    return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+function rgbToHex(array) {
+    array = array.split(',');
+    return "#" + componentToHex(Number(array[0])) + componentToHex(Number(array[1])) + componentToHex(Number(array[2]));
 }
 
 function updateElements(){
@@ -264,19 +268,19 @@ function getValueBorderStyle(){
 }
 
 function getValueBackgroundColor() {
-    if(myUnderBox.style.backgroundColor==='none'){
+    if(myUnderBox.style.backgroundColor=='initial'){
         document.getElementById('backgroundColor').value = '#FFFFFF';
     } else {
-        document.getElementById('backgroundColor').value = myUnderBox.style.backgroundColor;
+        document.getElementById('backgroundColor').value = rgbToHex(myUnderBox.style.backgroundColor.slice(4,-1));
+        // document.getElementById('backgroundColor').value = rgbToHex(myUnderBox.style.backgroundColor);
     }
-    console.log(rgbToHex(myUnderBox.style.backgroundColor.slice(4,-1)));
 }
 
 function getValueBorderColor(){
     if(myUnderBox.style.backgroundColor==='none'){
         document.getElementById('borderColor').value = '#FFFFFF';
     } else {
-        document.getElementById('borderColor').value = myUnderBox.style.borderColor;
+        document.getElementById('borderColor').value = rgbToHex(myUnderBox.style.borderColor.slice(4,-1));
     }
 }
 
@@ -295,8 +299,8 @@ function addNewBox(shape) {
 
     myUnderBox = document.createElement('div');
     myUnderBox.setAttribute('id',('underBox'+numberOfBoxes).toString());
-    myUnderBox.style.cssText = "width: 110px; height:110px; background: none; position: relative; border:solid; border-color:black; border-width:1px;transform: translate(-50%, -50%);";
-    myUnderBox.setAttribute('onclick', 'handleUnderBoxDownButton(event)');
+    myUnderBox.style.cssText = "width: 110px; height:110px; background: none; position: relative; border:solid; border-color:#000000; border-width:1px;transform: translate(-50%, -50%);";
+    myUnderBox.setAttribute('onmousedown', 'handleUnderBoxDownButton(event)');
 
     myButton = document.createElement('button');
     myButton.setAttribute('id',('rotateButton'+numberOfBoxes).toString());
@@ -381,7 +385,6 @@ function addNewBox(shape) {
         text.setAttribute('onclick','handleTextAreaMouseDown(event)');
     }
 
-    console.log(myUnderBox.style.width);
     reCenterMyButton();
 
     cornerResizeTopLeft = document.createElement('div');
@@ -474,7 +477,8 @@ setInterval(() => {
     if(fontSizeChanger) {
         if (document.getElementById('Edit').style.display == 'block') {
             document.getElementById('text'+currentID).style.fontSize = document.getElementById('fontSize').value;
-            console.log("dont look at me i am doing my part! The value i am trying to change is " + document.getElementById('fontSize').value);
+            document.getElementById('text'+currentID).style.fontStyle = document.getElementById('fontStyle').value;
+            document.getElementById('text'+currentID).style.fontWeight = document.getElementById('fontWeight').value;
         }
     }
 }, 200);
@@ -516,29 +520,36 @@ function handleMouseMove(event) {
     reCenterMyButton();
 }
 
+function getValueFontStyle(){
+    let elem = document.getElementById('text'+currentID).style.fontStyle;
+    return elem ? elem : 0;
+}
+
+function getValueFontWeight(){
+    let elem = document.getElementById('text'+currentID).style.fontWeight;
+    return elem ? elem : 0;
+}
+
 function getValueFontSize(){
-    return document.getElementById('text'+currentID).style.fontSize;
+    let elem = document.getElementById('text'+currentID).style.fontSize;
+    return elem ? elem : 0;
 }
 
 function handleTextAreaMouseDown(event){
     if(event.target.id.includes('text')){
+        document.getElementById('fontStyle').value=getValueFontStyle();
+        document.getElementById('fontWeight').value = getValueFontWeight();
         document.getElementById('fontSize').value=getValueFontSize();
         document.getElementById('fontSettings').style.display='block';
         fontSizeChanger=true;
-        console.log('I am trying to change the font now! soo fontSizeChanger is '+ fontSizeChanger);
     }
 }
-function componentToHex(c) {
-    var hex = c.toString(16);
-    return hex.length == 1 ? "0" + hex : hex;
-}
-
-function rgbToHex(r, g, b) {
-    return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
-}
 function handleUnderBoxDownButton(event){
-    if(currentID.includes('UnderBox'))
+
+    if(currentID.includes('UnderBox')) {
         currentID = event.target.id.slice(8);
+        currentIdUncut = event.target.id;
+    }
     updateElements();
     getValueBackgroundColor();
 
@@ -555,6 +566,7 @@ function handleUnderBoxDownButton(event){
 
 function handleMouseDownButton(event) {
     currentID = event.target.id.slice(10);
+    currentIdUncut = event.target.id;
     getValueBackgroundColor();
     updateElements();
 
