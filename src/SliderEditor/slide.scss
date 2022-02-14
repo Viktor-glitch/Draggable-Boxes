@@ -1,0 +1,80 @@
+.slide_editor {
+  .se_panel {
+    margin: 0 auto;
+    width: 1170px;
+    height: 827px;
+    border: 1px solid black;
+  }
+
+  .cp_main_panel{
+    position: absolute;
+
+    .cp_left{
+      position: absolute;
+      height: 100%;
+      width: 2px;
+      background-color: #61dafb;
+      top:0;
+      left:0;
+    }
+    .cp_right{
+      position: absolute;
+      height: 100%;
+      width: 2px;
+      background-color: #61dafb;
+      top:0;
+      right:0;
+    }
+    .cp_top{
+      position: absolute;
+      height: 2px;
+      width: 100%;
+      background-color: #61dafb;
+      top:0;
+      left:0;
+    }
+    .cp_bottom{
+      position: absolute;
+      height: 2px;
+      width: 100%;
+      background-color: #61dafb;
+      bottom:0;
+      left:0;
+    }
+
+    .cp_move{
+      position: absolute;
+      height: 10px;
+      width: 10px;
+      background-color: #61dafb;
+      bottom: -20px;
+      left: 30%;
+      cursor: move;
+    }
+
+    .cp_rotate{
+      position: absolute;
+      height: 10px;
+      width: 10px;
+      background-color: #61dafb;
+      bottom: -20px;
+      left: 60%;
+    }
+
+    .cp_bottomRight{
+      position: absolute;
+      height: 10px;
+      width: 10px;
+      background-color: #61dafb;
+      bottom:-5px;
+      right: -5px;
+      cursor: nwse-resize;
+    }
+    img{
+      height:100%;
+      position:absolute;
+      width:100%;
+      left:0;
+    }
+  }
+}
