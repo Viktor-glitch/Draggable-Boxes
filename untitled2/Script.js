@@ -1,4 +1,12 @@
 document.onmouseup = handleMouseUp;
+document.addEventListener('paste', e=>{
+    if(e.clipboardData.getData('text/plain')){
+        addNewBox(4);
+         document.getElementById('text'+currentID).innerText=e.clipboardData.getData('text/plain');
+        console.log(e.clipboardData.getData(''));
+    }else if(e.clipboardData.getData('img/plain')
+
+})
 let currentIdUncut
 let highestZIndex = 0;
 let currentID = '0';
@@ -376,13 +384,14 @@ function addNewBox(shape) {
         image.onload = CreateDelegate(image, imgTesting_onload);
         image.style.cssText = 'width: 100%; height:100%;';
     } else if(shape == 4){
-
         var text = document.createElement('div');
         text.setAttribute('id','text' + currentID);
         text.style.cssText = 'width: 100%; height:100%; font-size:30px; overflow:hidden;';
         text.setAttribute('contenteditable', 'true');
         myUnderBox.appendChild(text);
         text.setAttribute('onclick','handleTextAreaMouseDown(event)');
+        myUnderBox.style.cssText = "width: 700px; height: auto; min-height: 20px; min-width : 30px background: none; position: relative; border:solid; border-color:#000000; border-width:1px;transform: translate(-50%, -50%);";
+        boxWrapper.style.cssText = "width: 110px; height:110px; left: 500px; top:100px;position: absolute; transform-origin: top left;";
     }
 
     reCenterMyButton();
@@ -544,24 +553,25 @@ function handleTextAreaMouseDown(event){
         fontSizeChanger=true;
     }
 }
-function handleUnderBoxDownButton(event){
 
-    if(currentID.includes('UnderBox')) {
+function handleUnderBoxDownButton(event){
+    if(event.target.id.includes('UnderBox')) {
         currentID = event.target.id.slice(8);
         currentIdUncut = event.target.id;
     }
     updateElements();
     getValueBackgroundColor();
 
-    boxWrapper.style.zIndex=(highestZIndex + 1).toString();
-    myButton.style.zIndex=(highestZIndex + 1).toString();
-    myUnderBox.style.zIndex=(highestZIndex + 1).toString();
-    myMoveButton.style.zIndex=(highestZIndex+=1).toString();
+    bringLatestToFront();
 
-    if(!event.target.id.includes('text'))
-        document.getElementById('fontSettings').style.display='none';
+    if(!event.target.id.includes('text')) {
+        document.getElementById('fontSettings').style.display = 'none';
+        console.log('I am in handleUnderBoxDownButton()');
+        console.log(highestZIndex);
+    }
 
     document.getElementById('Edit').style.display = 'block';
+
 }
 
 function handleMouseDownButton(event) {
@@ -575,14 +585,19 @@ function handleMouseDownButton(event) {
     startingMouseInsideX = Number(boxWrapper.style.left.slice(0,-2));
     startingMouseInsideY = Number(boxWrapper.style.top.slice(0,-2));
 
-    boxWrapper.style.zIndex=(highestZIndex + 1).toString();
-    myButton.style.zIndex=(highestZIndex + 1).toString();
-    myUnderBox.style.zIndex=(highestZIndex + 1).toString();
-    myMoveButton.style.zIndex=(highestZIndex+=1).toString();
+    bringLatestToFront()
 
     document.onmousemove = handleMouseMove;
 }
 
 function handleMouseUp() {
     document.onmousemove = null;
+}
+
+function bringLatestToFront(){
+    //boxWrapper.style.zIndex=(highestZIndex + 1).toString();
+    console.log("Changing Z index");
+    myButton.style.zIndex=(highestZIndex + 1).toString();
+    myUnderBox.style.zIndex=(highestZIndex + 1).toString();
+    myMoveButton.style.zIndex=(highestZIndex+=1).toString();
 }
