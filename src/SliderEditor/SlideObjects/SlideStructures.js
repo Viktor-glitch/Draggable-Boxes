@@ -2,6 +2,9 @@ import React from 'react';
 import TextObject from './TextObject'
 import ImageObject from "./ImageObject";
 import ShapeObject from "./ShapeObject";
+import HtmlObject from "./HtmlObject";
+import TableObject from './TableObject'
+import ChartObject from './ChartObject'
 
 
 const SlideTypes = {
@@ -9,6 +12,8 @@ const SlideTypes = {
     shapeObject: 'shapeObject',
     chartObject: 'chartObject',
     imageObject: 'imageObject',
+    htmlObject: 'htmlObject',
+    tableObject: 'tableObject',
 }
 
 class SlideObject{
@@ -29,6 +34,13 @@ class SlideObject{
                 return <ImageObject value={this.value}/>
             case SlideTypes.shapeObject:
                 return <ShapeObject value = {1}/>
+            case SlideTypes.htmlObject:
+                return <HtmlObject value={this.value}/>
+            case SlideTypes.tableObject:
+                return <TableObject value={this.value} />
+            case SlideTypes.chartObject:
+                return <ChartObject value={this.value} />
+
         }
 
         return <div>Nope</div>
